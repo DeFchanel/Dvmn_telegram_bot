@@ -21,20 +21,21 @@ if __name__ == '__main__':
             response = requests.get(url, headers=headers,params=params)
             response.raise_for_status()
             check_result = response.json()
-            bot.send_message(chat_id=chat_id, text=f"У вас проверили работу '{check_result['new_attempts'][0]['lesson_title']}'.")
             if check_result['status'] == 'timeout':
                 params = {
                     'timestamp': check_result['timestamp_to_request']
                 }
                 continue
-            elif check_result['new_attempts'][0]['is_negative']:
-                bot.send_message(chat_id=chat_id, text=f"К сожалению в работе нашлись ошибки.")
             else:
-                bot.send_message(chat_id=chat_id, text="Все верно! Можно приступать к следующему уроку!.")
-            bot.send_message(chat_id=chat_id, text=f"Ссылка на урок: {check_result['new_attempts'][0]['lesson_url']}.")
-            params = {
-                'timestamp': check_result['new_attempts'][0]['timestamp']
-            }
+                bot.send_message(chat_id=chat_id, text=f"У вас проверили работу '{check_result['new_attempts'][0]['lesson_title']}'.")
+                if check_result['new_attempts'][0]['is_negative']:
+                    bot.send_message(chat_id=chat_id, text=f"К сожалению в работе нашлись ошибки.")
+                else:
+                    bot.send_message(chat_id=chat_id, text="Все верно! Можно приступать к следующему уроку!.")
+                bot.send_message(chat_id=chat_id, text=f"Ссылка на урок: {check_result['new_attempts'][0]['lesson_url']}.")
+                params = {
+                    'timestamp': check_result['new_attempts'][0]['timestamp']
+                }
         except requests.exceptions.ReadTimeout:
             continue
         except requests.exceptions.ConnectionError:
